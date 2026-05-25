@@ -31,6 +31,107 @@
 
   <title>banksampah</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Include html2pdf.js from CDN for client-side PDF generation & downloading -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5IfS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvCpuqpQ5OPQsn3VMGrXMmAFLqmHR86COk5TGlg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    function downloadPdfFromHtml(title, htmlContent) {
+      const element = document.createElement('div');
+      
+      // Inject standard printable styles so they render beautifully in html2pdf
+      const style = `
+        <style>
+          body, div, table {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #000;
+            background-color: #fff;
+            font-size: 13px;
+            line-height: 1.4;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          .header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+          }
+          .header p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+          }
+          .divider {
+            border-top: 1px solid #000;
+            margin: 15px 0;
+          }
+          .divider-dashed {
+            border-top: 1px dashed #000;
+            margin: 15px 0;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+          }
+          th, td {
+            padding: 6px 4px;
+            text-align: left;
+            vertical-align: top;
+          }
+          th {
+            border-bottom: 1px solid #000;
+            border-top: 1px solid #000;
+            font-weight: bold;
+          }
+          .text-right {
+            text-align: right;
+          }
+          .text-center {
+            text-align: center;
+          }
+          .font-bold {
+            font-weight: bold;
+          }
+          .total-row {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            font-weight: bold;
+          }
+          .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+          }
+          .signature-box {
+            text-align: center;
+            width: 45%;
+          }
+          .signature-space {
+            height: 60px;
+          }
+          .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 5px;
+          }
+        </style>
+      `;
+      
+      element.innerHTML = style + htmlContent;
+      
+      const opt = {
+        margin:       15,
+        filename:     title + '.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      // Generate the PDF and automatically download it to the browser's download folder
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

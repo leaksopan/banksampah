@@ -1,13 +1,30 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+import 'dart:js' as js;
 
 void printCurrentPageImpl() {
   html.window.print();
 }
 
 void printHtmlImpl(String title, String htmlContent) {
-  // 1. Create a hidden iframe element
+  try {
+    // Attempt client-side PDF download using html2pdf.js
+    if (js.context.hasProperty('downloadPdfFromHtml')) {
+      js.context.callMethod('downloadPdfFromHtml', [title, htmlContent]);
+      return;
+    }
+  } catch (e) {
+    // If anything fails, fall back to native print iframe
+    // ignore: avoid_print
+    print('Error using html2pdf client side, falling back to print iframe: $e');
+  }
+
+  // FALLBACK: 1. Remove existing print iframe if it exists to prevent cluttering
+  html.document.getElementById('app-print-iframe')?.remove();
+
+  // 2. Create a hidden iframe element
   final iframe = html.IFrameElement();
+  iframe.id = 'app-print-iframe';
   iframe.style
     ..width = '0'
     ..height = '0'
@@ -22,11 +39,11 @@ void printHtmlImpl(String title, String htmlContent) {
 
   final doc = contentWindow.document as html.HtmlDocument;
 
-  // 2. Set title and content
+  // 3. Set title and content
   doc.title = title;
   doc.body?.innerHtml = htmlContent;
 
-  // 3. Create a style element and append to head
+  // 4. Create a style element and append to head
   final style = html.StyleElement();
   style.text = '''
     body {
@@ -111,11 +128,8 @@ void printHtmlImpl(String title, String htmlContent) {
   ''';
   doc.head?.append(style);
 
-  // 4. Trigger print and remove iframe afterwards
+  // 5. Trigger print without removing the iframe immediately (prevents premature abort on Chrome/Edge)
   Future.delayed(const Duration(milliseconds: 500), () {
     contentWindow.print();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      iframe.remove();
-    });
   });
 }
