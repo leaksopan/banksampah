@@ -94,7 +94,7 @@ class BankSampahRepository {
     final response = await _client
         .from('mSampah')
         .select(
-          'Sampah_ID, Kode_Sampah, Nama_Sampah, Kategori_ID, Kode_Satuan, Harga_Beli, Harga_Jual, Stock_Akhir, Min_Stock, Aktif, UnitBisnisID, mKategori(Nama_Kategori)',
+          'Sampah_ID, Kode_Sampah, Nama_Sampah, Kategori_ID, Kode_Satuan, Harga_Beli, Harga_Jual, Stock_Akhir, Min_Stock, Aktif, Persen_Insentif, UnitBisnisID, mKategori(Nama_Kategori)',
         )
         .eq('Aktif', true)
         .order('Nama_Sampah');
@@ -106,7 +106,7 @@ class BankSampahRepository {
     final response = await _client
         .from('mSampah')
         .select(
-          'Sampah_ID, Kode_Sampah, Nama_Sampah, Kategori_ID, Kode_Satuan, Harga_Beli, Harga_Jual, Stock_Akhir, Min_Stock, Aktif, UnitBisnisID, mKategori(Nama_Kategori)',
+          'Sampah_ID, Kode_Sampah, Nama_Sampah, Kategori_ID, Kode_Satuan, Harga_Beli, Harga_Jual, Stock_Akhir, Min_Stock, Aktif, Persen_Insentif, UnitBisnisID, mKategori(Nama_Kategori)',
         )
         .order('Aktif', ascending: false)
         .order('Nama_Sampah');
@@ -230,6 +230,7 @@ class BankSampahRepository {
     required num hargaJual,
     required num minStock,
     required bool aktif,
+    required num persenInsentif,
     int? userUpdate,
   }) async {
     final payload = <String, dynamic>{
@@ -241,6 +242,7 @@ class BankSampahRepository {
       'Harga_Jual': hargaJual,
       'Min_Stock': minStock,
       'Aktif': aktif,
+      'Persen_Insentif': persenInsentif,
       'UnitBisnisID': unitBisnisId,
       'User_Update': userUpdate,
       'TglBerlaku_Harga': DateTime.now().toIso8601String(),

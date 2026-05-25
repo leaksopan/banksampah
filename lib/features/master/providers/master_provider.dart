@@ -143,6 +143,7 @@ class SaveMasterController extends AutoDisposeAsyncNotifier<void> {
     required num hargaJual,
     required num minStock,
     required bool aktif,
+    required num persenInsentif,
   }) async {
     final appUser = await ref.read(appUserProvider.future);
     final unitBisnisId = appUser?.primaryUnitBisnisId;
@@ -167,6 +168,7 @@ class SaveMasterController extends AutoDisposeAsyncNotifier<void> {
             hargaJual: hargaJual,
             minStock: minStock,
             aktif: aktif,
+            persenInsentif: persenInsentif,
             userUpdate: appUser?.userId,
           );
     });

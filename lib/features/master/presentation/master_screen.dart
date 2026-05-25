@@ -257,7 +257,8 @@ class _SampahTab extends ConsumerWidget {
       itemBuilder: (item) => _MasterTile(
         title: item.namaSampah,
         subtitle:
-            '${item.kodeSampah} - ${AppFormatters.rupiah(item.hargaBeli)} / ${item.kodeSatuan}',
+            '${item.kodeSampah} - ${AppFormatters.rupiah(item.hargaBeli)} / ${item.kodeSatuan}'
+            '${item.persenInsentif > 0 ? " (Insentif: ${item.persenInsentif}%)" : ""}',
         trailing: _StatusChip(active: item.aktif),
         onTap: () => onEdit(item),
       ),
@@ -724,6 +725,7 @@ class _SampahDialogState extends ConsumerState<_SampahDialog> {
   late final TextEditingController _hargaBeliController;
   late final TextEditingController _hargaJualController;
   late final TextEditingController _minStockController;
+  late final TextEditingController _persenInsentifController;
   late int _kategoriId;
   late String _kodeSatuan;
   late bool _aktif;
@@ -743,6 +745,9 @@ class _SampahDialogState extends ConsumerState<_SampahDialog> {
     _minStockController = TextEditingController(
       text: sampah == null ? '0' : sampah.minStock.toString(),
     );
+    _persenInsentifController = TextEditingController(
+      text: sampah == null ? '0' : sampah.persenInsentif.toString(),
+    );
     _kategoriId = sampah?.kategoriId ?? widget.kategori.first.kategoriId;
     _kodeSatuan = sampah?.kodeSatuan ?? widget.satuan.first.kodeSatuan;
     _aktif = sampah?.aktif ?? true;
@@ -755,6 +760,7 @@ class _SampahDialogState extends ConsumerState<_SampahDialog> {
     _hargaBeliController.dispose();
     _hargaJualController.dispose();
     _minStockController.dispose();
+    _persenInsentifController.dispose();
     super.dispose();
   }
 
@@ -773,6 +779,7 @@ class _SampahDialogState extends ConsumerState<_SampahDialog> {
           hargaJual: _parseNum(_hargaJualController.text),
           minStock: _parseNum(_minStockController.text),
           aktif: _aktif,
+          persenInsentif: _parseNum(_persenInsentifController.text),
         );
     if (saved && mounted) {
       Navigator.of(context).pop(true);
@@ -848,6 +855,12 @@ class _SampahDialogState extends ConsumerState<_SampahDialog> {
               _NumberTextField(
                 controller: _hargaJualController,
                 label: 'Harga Jual',
+              ),
+              const SizedBox(height: 10),
+              _NumberTextField(
+                controller: _persenInsentifController,
+                label: 'Persen Insentif (%)',
+                allowZero: true,
               ),
               const SizedBox(height: 10),
               _NumberTextField(

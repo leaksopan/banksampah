@@ -82,6 +82,7 @@ class Sampah {
     this.hargaJual = 0,
     this.minStock = 0,
     this.aktif = true,
+    this.persenInsentif = 0.00,
   });
 
   final int sampahId;
@@ -96,6 +97,7 @@ class Sampah {
   final num hargaJual;
   final num minStock;
   final bool aktif;
+  final num persenInsentif;
 
   factory Sampah.fromJson(Map<String, dynamic> json) {
     final kategori = json['mKategori'];
@@ -115,6 +117,7 @@ class Sampah {
       hargaJual: (json['Harga_Jual'] as num?) ?? 0,
       minStock: (json['Min_Stock'] as num?) ?? 0,
       aktif: (json['Aktif'] as bool?) ?? true,
+      persenInsentif: (json['Persen_Insentif'] as num?) ?? 0.00,
     );
   }
 }
