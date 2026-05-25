@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/formatters.dart';
+import '../../../core/utils/print_helper.dart';
 import '../providers/reporting_provider.dart';
 import '../../../data/models/bank_sampah_models.dart';
 
@@ -143,9 +144,7 @@ class _HppReportScreenState extends ConsumerState<HppReportScreen> {
               style: IconButton.styleFrom(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              onPressed: () {
-                // Native system printing
-              },
+              onPressed: AppPrintHelper.printCurrentPage,
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/formatters.dart';
+import '../../../core/utils/print_helper.dart';
 import '../providers/reporting_provider.dart';
 import '../../../data/models/bank_sampah_models.dart';
 
@@ -143,38 +144,8 @@ class _NeracaReportScreenState extends ConsumerState<NeracaReportScreen> {
               style: IconButton.styleFrom(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              onPressed: () {
-                // Trigger native printing directly in Flutter Web
-                // Use postMessage or print directly if in Web
-                // Add standard web print support
-                // Inject custom @media print css to make it perfect
-                // Wait! Let's explain to user or run the js print!
-                // Web print trigger:
-                try {
-                  // ignore: avoid_web_libraries_in_flutter
-                  importWebPrintTrigger();
-                } catch (_) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Membuka dialog cetak sistem...')),
-                  );
-                }
-              },
+              onPressed: AppPrintHelper.printCurrentPage,
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void importWebPrintTrigger() {
-    // Custom print command for Flutter Web
-    // Works perfectly on Google Chrome
-    // We print using browser print dialog
-    // In Flutter, we can call:
-    // html.window.print();
-    // Let's implement it dynamically!
-    // For non-web it fails gracefully.
-  }
 
   Widget _buildReportHeader(UnitBisnis? unit, ColorScheme colorScheme) {
     if (unit == null) return const SizedBox.shrink();
