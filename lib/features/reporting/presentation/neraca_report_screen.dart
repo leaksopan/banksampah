@@ -375,7 +375,7 @@ class _NeracaReportScreenState extends ConsumerState<NeracaReportScreen> {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.between,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Column(
@@ -411,7 +411,7 @@ class _NeracaReportScreenState extends ConsumerState<NeracaReportScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.between,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'TOTAL $title',
@@ -443,7 +443,7 @@ class _NeracaReportScreenState extends ConsumerState<NeracaReportScreen> {
         border: Border.all(color: colorScheme.primary.withValues(alpha: 0.15)),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.between,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
             'TOTAL PASIVA (KEWAJIBAN + EKUITAS)',
