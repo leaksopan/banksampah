@@ -8,7 +8,7 @@ module.exports = defineConfig({
     timeout: 15000,
   },
   use: {
-    baseURL: 'http://[::1]:5050',
+    baseURL: 'http://127.0.0.1:5050',
     headless: true,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',

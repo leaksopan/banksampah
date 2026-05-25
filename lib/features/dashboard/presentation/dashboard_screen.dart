@@ -94,10 +94,10 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: _QuickAction(
-                  icon: Icons.add_rounded,
-                  label: 'Setoran',
+                  icon: isAdmin ? Icons.add_rounded : Icons.swap_horiz_rounded,
+                  label: isAdmin ? 'Setoran' : 'Transfer',
                   color: colorScheme.primary,
-                  onTap: isAdmin ? () => context.go(RoutePaths.setoran) : () {},
+                  onTap: isAdmin ? () => context.go(RoutePaths.setoran) : () => context.go(RoutePaths.transferSaldo),
                 ),
               ),
               const SizedBox(width: 8),

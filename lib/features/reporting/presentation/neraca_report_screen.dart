@@ -27,6 +27,107 @@ class _SaldoLabaCalculator {
 class _NeracaReportScreenState extends ConsumerState<NeracaReportScreen> {
   DateTime _selectedDate = DateTime.now();
 
+  void _printNeraca(List<ReportNeracaItem> list, UnitBisnis? unit) {
+    final unitName = unit?.unitBisnisName ?? 'Bank Sampah Pemda';
+    final unitNameFull = unit?.unitBisnisName ?? 'Bank Sampah Pemda';
+    final formattedDate = AppFormatters.shortDate(_selectedDate);
+
+    final aktivaList = list.where((x) => x.kategoriCoa == 'AKTIVA_LANCAR' || x.kategoriCoa == 'AKTIVA_TETAP').toList();
+    final kewajibanList = list.where((x) => x.kategoriCoa == 'KEWAJIBAN').toList();
+    final ekuitasList = list.where((x) => x.kategoriCoa == 'EKUITAS').toList();
+
+    num totalAktiva = aktivaList.fold(0, (sum, x) => sum + x.saldo);
+    num totalKewajiban = kewajibanList.fold(0, (sum, x) => sum + x.saldo);
+    num totalEkuitas = ekuitasList.fold(0, (sum, x) => sum + x.saldo);
+    num totalPasiva = totalKewajiban + totalEkuitas;
+
+    String buildRows(List<ReportNeracaItem> items) {
+      if (items.isEmpty) {
+        return '<tr><td colspan="2" style="font-style: italic; color: #888; padding: 4px;">(Tidak ada saldo)</td></tr>';
+      }
+      return items.map((x) => '''
+        <tr>
+          <td style="padding: 5px 4px;">${x.coaId} - ${x.coaName}</td>
+          <td class="text-right font-bold" style="padding: 5px 4px;">${AppFormatters.rupiah(x.saldo)}</td>
+        </tr>
+      ''').join('\n');
+    }
+
+    final isBalanced = (totalAktiva - totalPasiva).abs() < 0.05;
+
+    final htmlContent = '''
+      <div class="header">
+        <h2 style="color: #2E7D32; font-size: 20px; margin: 0 0 2px 0;">$unitName</h2>
+        <p class="font-bold" style="font-size: 11px; margin: 0 0 12px 0; color: #555;">$unitNameFull</p>
+        <h3 class="font-bold" style="font-size: 16px; margin: 0 0 4px 0; letter-spacing: 0.5px;">LAPORAN NERACA KEUANGAN</h3>
+        <p class="font-bold" style="margin: 0; font-size: 12px; color: #333;">Per Tanggal: $formattedDate</p>
+      </div>
+      <div class="divider"></div>
+      
+      <table style="width: 100%; border: 1px solid #000; margin-bottom: 20px;">
+        <thead>
+          <tr style="background-color: #f4f6f8;">
+            <th style="width: 50%; padding: 8px 10px; border-bottom: 1px solid #000; border-right: 1px solid #000; text-align: left;">AKTIVA (ASSETS)</th>
+            <th style="width: 50%; padding: 8px 10px; border-bottom: 1px solid #000; text-align: left;">PASIVA (LIABILITIES & EQUITY)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="vertical-align: top; border-right: 1px solid #000; padding: 10px;">
+              <table style="width: 100%; margin: 0;">
+                ${buildRows(aktivaList)}
+                <tr class="total-row">
+                  <td style="padding: 8px 4px; border-top: 1px solid #000;">TOTAL AKTIVA</td>
+                  <td class="text-right" style="padding: 8px 4px; border-top: 1px solid #000;">${AppFormatters.rupiah(totalAktiva)}</td>
+                </tr>
+              </table>
+            </td>
+            <td style="vertical-align: top; padding: 10px;">
+              <table style="width: 100%; margin: 0;">
+                <tr><td colspan="2" class="font-bold" style="padding: 3px 4px; border-bottom: 1px dashed #ccc; font-size: 11px; color: #555;">KEWAJIBAN</td></tr>
+                ${buildRows(kewajibanList)}
+                <tr class="font-bold">
+                  <td style="padding: 8px 4px; padding-left: 10px;">Subtotal Kewajiban</td>
+                  <td class="text-right" style="padding: 8px 4px;">${AppFormatters.rupiah(totalKewajiban)}</td>
+                </tr>
+                <tr><td colspan="2" class="font-bold" style="padding: 12px 4px 3px 4px; border-bottom: 1px dashed #ccc; font-size: 11px; color: #555;">EKUITAS</td></tr>
+                ${buildRows(ekuitasList)}
+                <tr class="font-bold">
+                  <td style="padding: 8px 4px; padding-left: 10px;">Subtotal Ekuitas</td>
+                  <td class="text-right" style="padding: 8px 4px;">${AppFormatters.rupiah(totalEkuitas)}</td>
+                </tr>
+                <tr class="total-row">
+                  <td style="padding: 8px 4px; border-top: 1px solid #000;">TOTAL PASIVA</td>
+                  <td class="text-right" style="padding: 8px 4px; border-top: 1px solid #000;">${AppFormatters.rupiah(totalPasiva)}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 15px; padding: 12px; border: 1px solid ${isBalanced ? '#2E7D32' : '#c62828'}; background-color: ${isBalanced ? '#e8f5e9' : '#ffebee'}; border-radius: 6px; text-align: center; font-weight: bold; font-size: 13px;">
+        Status Neraca: ${isBalanced ? 'SEIMBANG (BALANCED)' : 'TIDAK SEIMBANG (UNBALANCED)'}
+      </div>
+
+      <div class="signature-section" style="margin-top: 40px;">
+        <div class="signature-box">
+          <p style="margin: 0 0 50px 0;">Disiapkan Oleh,<br>Operator TPS</p>
+          <div class="signature-line"></div>
+        </div>
+        <div class="signature-box">
+          <p style="margin: 0 0 50px 0;">Disetujui Oleh,<br>Ketua Unit Bisnis / Kepala OPD</p>
+          <div class="signature-line"></div>
+        </div>
+      </div>
+    ''';
+
+    AppPrintHelper.printHtml(
+      title: 'Laporan Neraca - $formattedDate',
+      htmlContent: htmlContent,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -144,7 +245,17 @@ class _NeracaReportScreenState extends ConsumerState<NeracaReportScreen> {
               style: IconButton.styleFrom(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              onPressed: AppPrintHelper.printCurrentPage,
+              onPressed: () {
+                final neracaList = ref.read(reportNeracaProvider(_selectedDate)).valueOrNull;
+                final unit = ref.read(currentUnitBisnisProvider).valueOrNull;
+                if (neracaList != null) {
+                  _printNeraca(neracaList, unit);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Laporan belum dimuat sepenuhnya.')),
+                  );
+                }
+              },
             ),
           ],
         ),

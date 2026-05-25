@@ -17,6 +17,7 @@ class RoutePaths {
   static const penarikan = '/penarikan';
   static const penarikanNew = '/penarikan/new';
   static const penarikanDetailBase = '/penarikan/detail';
+  static const transferSaldo = '/transfer-saldo';
   static const reporting = '/reporting';
   static const reportKartuGudang = '/reporting/kartu-gudang';
   static const reportSaldoPegawai = '/reporting/saldo-pegawai';

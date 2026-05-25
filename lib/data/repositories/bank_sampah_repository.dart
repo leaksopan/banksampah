@@ -760,6 +760,44 @@ class BankSampahRepository {
     throw const FormatException('Response RPC tidak valid.');
   }
 
+  Future<List<Pegawai>> listSesamaPegawai({required int unitBisnisId, required int excludePegawaiId}) async {
+    final response = await _client
+        .from('mPegawai')
+        .select()
+        .eq('UnitBisnisID', unitBisnisId)
+        .eq('Status_Aktif', true)
+        .neq('Pegawai_ID', excludePegawaiId)
+        .order('Nama_Pegawai');
+    return _mapList(response, Pegawai.fromJson);
+  }
+
+  Future<void> executeTransferSaldo({
+    required int pengirimPegawaiId,
+    required int penerimaPegawaiId,
+    required num jumlah,
+    String? keterangan,
+    required int unitBisnisId,
+    int? userId,
+  }) async {
+    final noBukti = 'TRF/' +
+        DateTime.now().year.toString() +
+        DateTime.now().month.toString().padLeft(2, '0') +
+        DateTime.now().day.toString().padLeft(2, '0') +
+        '/' +
+        DateTime.now().millisecondsSinceEpoch.toString().substring(8);
+
+    await _client.from('BS_trTransfer').insert({
+      'No_Bukti': noBukti,
+      'Pengirim_Pegawai_ID': pengirimPegawaiId,
+      'Penerima_Pegawai_ID': penerimaPegawaiId,
+      'Jumlah': jumlah,
+      'Keterangan': (keterangan ?? '').trim(),
+      'User_ID': userId,
+      'UnitBisnisID': unitBisnisId,
+      'Posted': true,
+    });
+  }
+
   String? _nullIfBlank(String value) {
     final trimmed = value.trim();
     return trimmed.isEmpty ? null : trimmed;

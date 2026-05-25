@@ -27,49 +27,61 @@ class MainLayout extends ConsumerWidget {
     final items = _buildItems(isAdmin);
     final selectedIndex = _resolveSelectedIndex(items);
 
-    return Scaffold(
-      extendBody: true,
-      body: child,
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 22,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: SizedBox(
-            height: 64,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                for (var index = 0; index < items.length; index++)
-                  _BottomNavItem(
-                    icon: items[index].icon,
-                    label: items[index].label,
-                    selected: selectedIndex == index,
-                    onTap: () async {
-                      if (items[index].action == _BottomAction.signOut) {
-                        await _signOut(ref);
-                        return;
-                      }
+    final showNavbar = [
+      RoutePaths.dashboard,
+      RoutePaths.setoran,
+      RoutePaths.penjualan,
+      RoutePaths.master,
+      RoutePaths.reporting,
+      RoutePaths.penarikan,
+      RoutePaths.approval,
+    ].contains(currentLocation);
 
-                      if (context.mounted) {
-                        context.go(items[index].path!);
-                      }
-                    },
+    return Scaffold(
+      extendBody: false,
+      body: child,
+      bottomNavigationBar: showNavbar
+          ? SafeArea(
+              minimum: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 22,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  height: 64,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      for (var index = 0; index < items.length; index++)
+                        _BottomNavItem(
+                          icon: items[index].icon,
+                          label: items[index].label,
+                          selected: selectedIndex == index,
+                          onTap: () async {
+                            if (items[index].action == _BottomAction.signOut) {
+                              await _signOut(ref);
+                              return;
+                            }
+
+                            if (context.mounted) {
+                              context.go(items[index].path!);
+                            }
+                          },
+                        ),
+                    ],
                   ),
-              ],
-            ),
-          ),
-        ),
-      ),
+                ),
+              ),
+            )
+          : null,
     );
   }
 

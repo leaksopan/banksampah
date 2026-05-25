@@ -7,4 +7,8 @@ class AppPrintHelper {
   static void printCurrentPage() {
     printCurrentPageImpl();
   }
+
+  static void printHtml({required String title, required String htmlContent}) {
+    printHtmlImpl(title, htmlContent);
+  }
 }

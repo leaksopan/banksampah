@@ -922,3 +922,47 @@ class ReportHppLabaRugi {
   }
 }
 
+class TransferSaldo {
+  const TransferSaldo({
+    required this.noBukti,
+    required this.tglTransfer,
+    required this.pengirimPegawaiId,
+    required this.penerimaPegawaiId,
+    required this.namaPengirim,
+    required this.namaPenerima,
+    required this.jumlah,
+    required this.keterangan,
+    required this.statusBatal,
+    required this.posted,
+    required this.unitBisnisId,
+  });
+
+  final String noBukti;
+  final DateTime tglTransfer;
+  final int pengirimPegawaiId;
+  final int penerimaPegawaiId;
+  final String namaPengirim;
+  final String namaPenerima;
+  final num jumlah;
+  final String keterangan;
+  final bool statusBatal;
+  final bool posted;
+  final int unitBisnisId;
+
+  factory TransferSaldo.fromJson(Map<String, dynamic> json) {
+    return TransferSaldo(
+      noBukti: json['No_Bukti'] as String,
+      tglTransfer: DateTime.parse(json['Tgl_Transfer'] as String),
+      pengirimPegawaiId: json['Pengirim_Pegawai_ID'] as int,
+      penerimaPegawaiId: json['Penerima_Pegawai_ID'] as int,
+      namaPengirim: (json['mPegawai_Pengirim']?['Nama_Pegawai'] as String?) ?? '',
+      namaPenerima: (json['mPegawai_Penerima']?['Nama_Pegawai'] as String?) ?? '',
+      jumlah: (json['Jumlah'] as num?) ?? 0.0,
+      keterangan: (json['Keterangan'] as String?) ?? '',
+      statusBatal: (json['Status_Batal'] as bool?) ?? false,
+      posted: (json['Posted'] as bool?) ?? false,
+      unitBisnisId: json['UnitBisnisID'] as int,
+    );
+  }
+}
+

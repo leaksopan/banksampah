@@ -25,6 +25,91 @@ class _HppReportScreenState extends ConsumerState<HppReportScreen> {
     _toDate = DateTime(now.year, now.month, now.day + 1);
   }
 
+  void _printLabaRugi(ReportHppLabaRugi report, UnitBisnis? unit) {
+    final unitName = unit?.unitBisnisName ?? 'Bank Sampah Pemda';
+    final unitNameFull = unit?.unitBisnisName ?? 'Bank Sampah Pemda';
+    final formattedFrom = AppFormatters.shortDate(_fromDate);
+    final formattedTo = AppFormatters.shortDate(_toDate.subtract(const Duration(days: 1)));
+
+    final htmlContent = '''
+      <div class="header">
+        <h2 style="color: #2E7D32; font-size: 20px; margin: 0 0 2px 0;">$unitName</h2>
+        <p class="font-bold" style="font-size: 11px; margin: 0 0 12px 0; color: #555;">$unitNameFull</p>
+        <h3 class="font-bold" style="font-size: 15px; margin: 0 0 4px 0; letter-spacing: 0.5px;">LAPORAN LABA RUGI & HARGA POKOK PENJUALAN (HPP)</h3>
+        <p class="font-bold" style="margin: 0; font-size: 12px; color: #333;">Periode: $formattedFrom s.d $formattedTo</p>
+      </div>
+      <div class="divider"></div>
+      
+      <table style="width: 100%; border: 1px solid #000; margin-bottom: 20px;">
+        <thead>
+          <tr style="background-color: #f4f6f8;">
+            <th style="padding: 8px 10px; border-bottom: 1px solid #000; text-align: left;">DESKRIPSI AKUN</th>
+            <th style="padding: 8px 10px; border-bottom: 1px solid #000; text-align: left; width: 15%;">COA</th>
+            <th style="padding: 8px 10px; border-bottom: 1px solid #000; text-align: right; width: 25%;">NOMINAL (RP)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="3" class="font-bold" style="padding: 10px 4px 5px 4px; color: #2E7D32; font-size: 12px;">I. PENDAPATAN OPERASIONAL</td>
+          </tr>
+          <tr>
+            <td style="padding: 5px 10px;">Pendapatan Penjualan Sampah ke Pengepul</td>
+            <td>4101</td>
+            <td class="text-right">${AppFormatters.rupiah(report.totalPendapatan)}</td>
+          </tr>
+          <tr class="font-bold" style="border-top: 1px dashed #ccc;">
+            <td style="padding: 8px 10px;">TOTAL PENDAPATAN OPERASIONAL</td>
+            <td></td>
+            <td class="text-right" style="border-bottom: 1px solid #000;">${AppFormatters.rupiah(report.totalPendapatan)}</td>
+          </tr>
+          
+          <tr>
+            <td colspan="3" class="font-bold" style="padding: 15px 4px 5px 4px; color: #2E7D32; font-size: 12px;">II. HARGA POKOK PENJUALAN (HPP) FIFO</td>
+          </tr>
+          <tr>
+            <td style="padding: 5px 10px;">HPP Sampah Terjual (Pembelian dari Nasabah - FIFO)</td>
+            <td>5101</td>
+            <td class="text-right">(${AppFormatters.rupiah(report.totalHpp)})</td>
+          </tr>
+          <tr class="font-bold" style="border-top: 1px dashed #ccc;">
+            <td style="padding: 8px 10px;">TOTAL HARGA POKOK PENJUALAN (HPP)</td>
+            <td></td>
+            <td class="text-right" style="border-bottom: 1px solid #000;">(${AppFormatters.rupiah(report.totalHpp)})</td>
+          </tr>
+          
+          <tr class="total-row" style="background-color: #f4f6f8; font-size: 14px;">
+            <td style="padding: 10px; font-weight: bold;">LABA RUGI BERSIH TPS</td>
+            <td></td>
+            <td class="text-right" style="font-weight: bold; color: ${report.labaRugiBersih >= 0 ? '#2E7D32' : '#c62828'}">
+              ${AppFormatters.rupiah(report.labaRugiBersih)}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 15px; padding: 12px; border: 1px solid #78909c; background-color: #f4f6f8; border-radius: 6px; font-size: 11px; line-height: 1.4; color: #445;">
+        <strong>Catatan Akuntansi Perdagangan:</strong><br>
+        Laporan Laba Rugi ini menyajikan selisih bersih dari hasil penjualan sampah ke pengepul dikurangi harga beli dari nasabah (HPP FIFO). Keuntungan/kerugian harga ditanggung oleh TPS sebagai unit bisnis mandiri.
+      </div>
+
+      <div class="signature-section" style="margin-top: 40px;">
+        <div class="signature-box">
+          <p style="margin: 0 0 50px 0;">Disiapkan Oleh,<br>Operator TPS</p>
+          <div class="signature-line"></div>
+        </div>
+        <div class="signature-box">
+          <p style="margin: 0 0 50px 0;">Disetujui Oleh,<br>Ketua Unit Bisnis / Kepala OPD</p>
+          <div class="signature-line"></div>
+        </div>
+      </div>
+    ''';
+
+    AppPrintHelper.printHtml(
+      title: 'Laporan Laba Rugi - $formattedFrom s.d $formattedTo',
+      htmlContent: htmlContent,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -144,7 +229,18 @@ class _HppReportScreenState extends ConsumerState<HppReportScreen> {
               style: IconButton.styleFrom(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              onPressed: AppPrintHelper.printCurrentPage,
+              onPressed: () {
+                final params = HppLabaRugiParams(from: _fromDate, to: _toDate);
+                final report = ref.read(reportHppLabaRugiProvider(params)).valueOrNull;
+                final unit = ref.read(currentUnitBisnisProvider).valueOrNull;
+                if (report != null) {
+                  _printLabaRugi(report, unit);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Laporan belum dimuat sepenuhnya.')),
+                  );
+                }
+              },
             ),
           ],
         ),

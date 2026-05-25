@@ -209,13 +209,10 @@ class _MasterScreenState extends ConsumerState<MasterScreen>
           ],
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 76),
-        child: FloatingActionButton(
-          tooltip: _tabController.index == 0 ? 'Info pegawai' : 'Tambah master',
-          onPressed: _openCurrentForm,
-          child: Icon(fabIcon),
-        ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: _tabController.index == 0 ? 'Info pegawai' : 'Tambah master',
+        onPressed: _openCurrentForm,
+        child: Icon(fabIcon),
       ),
     );
   }
@@ -260,7 +257,7 @@ class _SampahTab extends ConsumerWidget {
       itemBuilder: (item) => _MasterTile(
         title: item.namaSampah,
         subtitle:
-            '${item.kodeSampah} - ${AppFormatters.rupiah(item.hargaBeli)} / ${item.kodeSatuan}'
+            '${item.kodeSampah} - Awal: ${AppFormatters.rupiah(item.hargaBeli)} | Baru: ${AppFormatters.rupiah(item.hargaJual)} / ${item.kodeSatuan}'
             '${item.persenInsentif > 0 ? " (Insentif: ${item.persenInsentif}%)" : ""}',
         trailing: _StatusChip(active: item.aktif),
         onTap: () => onEdit(item),
@@ -754,6 +751,25 @@ class _SampahDialogState extends ConsumerState<_SampahDialog> {
     _kategoriId = sampah?.kategoriId ?? widget.kategori.first.kategoriId;
     _kodeSatuan = sampah?.kodeSatuan ?? widget.satuan.first.kodeSatuan;
     _aktif = sampah?.aktif ?? true;
+
+    _hargaBeliController.addListener(_recalculateHargaBaru);
+    _persenInsentifController.addListener(_recalculateHargaBaru);
+  }
+
+  void _recalculateHargaBaru() {
+    final hargaAwalStr = _hargaBeliController.text.trim();
+    final persenStr = _persenInsentifController.text.trim();
+    if (hargaAwalStr.isEmpty) {
+      _hargaJualController.text = '';
+      return;
+    }
+    final hargaAwal = double.tryParse(hargaAwalStr) ?? 0.0;
+    final persen = double.tryParse(persenStr) ?? 0.0;
+    final hargaBaru = hargaAwal + (hargaAwal * persen / 100);
+    final formatted = hargaBaru % 1 == 0 ? hargaBaru.toInt().toString() : hargaBaru.toStringAsFixed(2);
+    if (_hargaJualController.text != formatted) {
+      _hargaJualController.text = formatted;
+    }
   }
 
   @override
@@ -852,12 +868,12 @@ class _SampahDialogState extends ConsumerState<_SampahDialog> {
               const SizedBox(height: 10),
               _NumberTextField(
                 controller: _hargaBeliController,
-                label: 'Harga Beli',
+                label: 'Harga Awal',
               ),
               const SizedBox(height: 10),
               _NumberTextField(
                 controller: _hargaJualController,
-                label: 'Harga Jual',
+                label: 'Harga Baru',
               ),
               const SizedBox(height: 10),
               _NumberTextField(

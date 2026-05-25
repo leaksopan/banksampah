@@ -1,5 +1,5 @@
 # supabase_backup.ps1
-# Script backup database otomatis untuk Bank Sampah Pemda Badung
+# Script backup database otomatis untuk Bank Sampah Pemda 
 # Project ID: jtxquskrulvjafrusbcq
 
 $ProjectRef = "jtxquskrulvjafrusbcq"

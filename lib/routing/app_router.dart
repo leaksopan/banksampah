@@ -17,6 +17,7 @@ import '../features/penjualan/presentation/penjualan_list_screen.dart';
 import '../features/penarikan/presentation/penarikan_detail_screen.dart';
 import '../features/penarikan/presentation/penarikan_form_screen.dart';
 import '../features/penarikan/presentation/penarikan_list_screen.dart';
+import '../features/penarikan/presentation/transfer_saldo_screen.dart';
 import '../features/reporting/presentation/reporting_screen.dart';
 import '../features/reporting/presentation/kartu_gudang_report_screen.dart';
 import '../features/reporting/presentation/saldo_pegawai_report_screen.dart';
@@ -139,6 +140,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 noBukti: Uri.decodeComponent(noBukti),
               );
             },
+          ),
+          GoRoute(
+            path: RoutePaths.transferSaldo,
+            builder: (context, state) => const TransferSaldoScreen(),
           ),
           GoRoute(
             path: RoutePaths.reporting,
