@@ -19,7 +19,7 @@ class ReportingScreen extends ConsumerWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 104),
         children: [
           _buildInfoBanner(colorScheme),
           const SizedBox(height: 24),

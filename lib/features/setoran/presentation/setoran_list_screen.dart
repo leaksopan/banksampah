@@ -143,10 +143,13 @@ class SetoranListScreen extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Setoran baru',
-        onPressed: () => context.go(RoutePaths.setoranNew),
-        child: const Icon(Icons.add_rounded),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 76),
+        child: FloatingActionButton(
+          tooltip: 'Setoran baru',
+          onPressed: () => context.go(RoutePaths.setoranNew),
+          child: const Icon(Icons.add_rounded),
+        ),
       ),
     );
   }

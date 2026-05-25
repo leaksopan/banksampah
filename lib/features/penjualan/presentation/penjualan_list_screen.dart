@@ -112,10 +112,13 @@ class PenjualanListScreen extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Penjualan baru',
-        onPressed: () => context.go(RoutePaths.penjualanNew),
-        child: const Icon(Icons.add_rounded),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 76),
+        child: FloatingActionButton(
+          tooltip: 'Penjualan baru',
+          onPressed: () => context.go(RoutePaths.penjualanNew),
+          child: const Icon(Icons.add_rounded),
+        ),
       ),
     );
   }

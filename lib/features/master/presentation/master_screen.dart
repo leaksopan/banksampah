@@ -209,10 +209,13 @@ class _MasterScreenState extends ConsumerState<MasterScreen>
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: _tabController.index == 0 ? 'Info pegawai' : 'Tambah master',
-        onPressed: _openCurrentForm,
-        child: Icon(fabIcon),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 76),
+        child: FloatingActionButton(
+          tooltip: _tabController.index == 0 ? 'Info pegawai' : 'Tambah master',
+          onPressed: _openCurrentForm,
+          child: Icon(fabIcon),
+        ),
       ),
     );
   }
