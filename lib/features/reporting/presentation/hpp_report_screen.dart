@@ -276,13 +276,15 @@ class _HppReportScreenState extends ConsumerState<HppReportScreen> {
   Widget _buildHeaderRow(String title, ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12, top: 8),
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w900,
-        color: colorScheme.primary,
-        letterSpacing: 0.5,
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w900,
+          color: colorScheme.primary,
+          letterSpacing: 0.5,
+        ),
       ),
-      child: Text(title),
     );
   }
 
@@ -290,7 +292,7 @@ class _HppReportScreenState extends ConsumerState<HppReportScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.between,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Column(
@@ -341,7 +343,7 @@ class _HppReportScreenState extends ConsumerState<HppReportScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.between,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,

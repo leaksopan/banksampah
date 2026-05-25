@@ -146,6 +146,11 @@ class _NeracaReportScreenState extends ConsumerState<NeracaReportScreen> {
               ),
               onPressed: AppPrintHelper.printCurrentPage,
             ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildReportHeader(UnitBisnis? unit, ColorScheme colorScheme) {
     if (unit == null) return const SizedBox.shrink();
