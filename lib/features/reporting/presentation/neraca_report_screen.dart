@@ -128,6 +128,107 @@ class _NeracaReportScreenState extends ConsumerState<NeracaReportScreen> {
     );
   }
 
+  void _exportNeracaCsv(List<ReportNeracaItem> list, UnitBisnis? unit) {
+    final unitName = unit?.unitBisnisName ?? 'Bank Sampah Pemda';
+    final formattedDate = AppFormatters.shortDate(_selectedDate);
+
+    final aktivaList = list.where((x) => x.kategoriCoa == 'AKTIVA_LANCAR' || x.kategoriCoa == 'AKTIVA_TETAP').toList();
+    final kewajibanList = list.where((x) => x.kategoriCoa == 'KEWAJIBAN').toList();
+    final ekuitasList = list.where((x) => x.kategoriCoa == 'EKUITAS').toList();
+
+    num totalAktiva = aktivaList.fold(0, (sum, x) => sum + x.saldo);
+    num totalKewajiban = kewajibanList.fold(0, (sum, x) => sum + x.saldo);
+    num totalEkuitas = ekuitasList.fold(0, (sum, x) => sum + x.saldo);
+    num totalPasiva = totalKewajiban + totalEkuitas;
+
+    final isBalanced = (totalAktiva - totalPasiva).abs() < 0.05;
+
+    // Helper to sanitize CSV fields (handling commas and quotes)
+    String esc(dynamic val) {
+      final str = val.toString().replaceAll('"', '""');
+      if (str.contains(',') || str.contains('\n') || str.contains('"')) {
+        return '"$str"';
+      }
+      return str;
+    }
+
+    final csv = StringBuffer();
+    csv.writeln('\uFEFF${esc('LAPORAN NERACA KEUANGAN (SAK-EMKM)')},,'); // UTF-8 BOM so Excel opens it with correct encoding
+    csv.writeln('${esc(unitName)},,');
+    csv.writeln('${esc('Per Tanggal: $formattedDate')},,');
+    csv.writeln(',,');
+
+    csv.writeln('${esc('AKTIVA (ASSETS)')},,,${esc('PASIVA (LIABILITIES & EQUITY)')}');
+    csv.writeln('${esc('Kode & Nama Akun')},${esc('Saldo (Rp)')},,${esc('Kode & Nama Akun')},${esc('Saldo (Rp)')}');
+
+    // We will align rows side-by-side
+    final int maxRows = aktivaList.length > (kewajibanList.length + ekuitasList.length + 4) 
+        ? aktivaList.length 
+        : (kewajibanList.length + ekuitasList.length + 4);
+
+    // Build lists for pasiva layout
+    final List<String> pasivaRowsCoa = [];
+    final List<num> pasivaRowsSaldo = [];
+
+    // Add Kewajiban Section
+    pasivaRowsCoa.add('KEWAJIBAN');
+    pasivaRowsSaldo.add(0); // divider placeholder
+    for (var x in kewajibanList) {
+      pasivaRowsCoa.add('${x.coaId} - ${x.coaName}');
+      pasivaRowsSaldo.add(x.saldo);
+    }
+    pasivaRowsCoa.add('Subtotal Kewajiban');
+    pasivaRowsSaldo.add(totalKewajiban);
+
+    // Spacer
+    pasivaRowsCoa.add('');
+    pasivaRowsSaldo.add(0);
+
+    // Add Ekuitas Section
+    pasivaRowsCoa.add('EKUITAS');
+    pasivaRowsSaldo.add(0);
+    for (var x in ekuitasList) {
+      pasivaRowsCoa.add('${x.coaId} - ${x.coaName}');
+      pasivaRowsSaldo.add(x.saldo);
+    }
+    pasivaRowsCoa.add('Subtotal Ekuitas');
+    pasivaRowsSaldo.add(totalEkuitas);
+
+    for (int i = 0; i < maxRows; i++) {
+      String aktivaCoa = '';
+      String aktivaSaldo = '';
+      if (i < aktivaList.length) {
+        final x = aktivaList[i];
+        aktivaCoa = '${x.coaId} - ${x.coaName}';
+        aktivaSaldo = x.saldo.toString();
+      }
+
+      String pasivaCoa = '';
+      String pasivaSaldo = '';
+      if (i < pasivaRowsCoa.length) {
+        pasivaCoa = pasivaRowsCoa[i];
+        final s = pasivaRowsSaldo[i];
+        // Don't print saldo for section dividers
+        if (pasivaCoa != 'KEWAJIBAN' && pasivaCoa != 'EKUITAS' && pasivaCoa.isNotEmpty) {
+          pasivaSaldo = s.toString();
+        }
+      }
+
+      csv.writeln('${esc(aktivaCoa)},${esc(aktivaSaldo)},,${esc(pasivaCoa)},${esc(pasivaSaldo)}');
+    }
+
+    // Totals Row
+    csv.writeln(',,');
+    csv.writeln('${esc('TOTAL AKTIVA')},${esc(totalAktiva)},,${esc('TOTAL PASIVA')},${esc(totalPasiva)}');
+    csv.writeln(',,');
+    csv.writeln('${esc('Status Neraca: ${isBalanced ? 'SEIMBANG (BALANCED)' : 'TIDAK SEIMBANG (UNBALANCED)'}')},,');
+
+    AppPrintHelper.exportCsv(
+      filename: 'Neraca_${unitName.replaceAll(' ', '_')}_$formattedDate.csv',
+      csvContent: csv.toString(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -250,6 +351,27 @@ class _NeracaReportScreenState extends ConsumerState<NeracaReportScreen> {
                 final unit = ref.read(currentUnitBisnisProvider).valueOrNull;
                 if (neracaList != null) {
                   _printNeraca(neracaList, unit);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Laporan belum dimuat sepenuhnya.')),
+                  );
+                }
+              },
+            ),
+            const SizedBox(width: 8),
+            IconButton.filledTonal(
+              icon: const Icon(Icons.table_view_rounded),
+              tooltip: 'Unduh Excel/CSV',
+              style: IconButton.styleFrom(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                backgroundColor: colorScheme.secondaryContainer,
+                foregroundColor: colorScheme.onSecondaryContainer,
+              ),
+              onPressed: () {
+                final neracaList = ref.read(reportNeracaProvider(_selectedDate)).valueOrNull;
+                final unit = ref.read(currentUnitBisnisProvider).valueOrNull;
+                if (neracaList != null) {
+                  _exportNeracaCsv(neracaList, unit);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Laporan belum dimuat sepenuhnya.')),

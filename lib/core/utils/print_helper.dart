@@ -11,4 +11,8 @@ class AppPrintHelper {
   static void printHtml({required String title, required String htmlContent}) {
     printHtmlImpl(title, htmlContent);
   }
+
+  static void exportCsv({required String filename, required String csvContent}) {
+    exportCsvImpl(filename, csvContent);
+  }
 }

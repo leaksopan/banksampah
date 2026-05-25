@@ -110,6 +110,49 @@ class _HppReportScreenState extends ConsumerState<HppReportScreen> {
     );
   }
 
+  void _exportLabaRugiCsv(ReportHppLabaRugi report, UnitBisnis? unit) {
+    final unitName = unit?.unitBisnisName ?? 'Bank Sampah Pemda';
+    final formattedFrom = AppFormatters.shortDate(_fromDate);
+    final formattedTo = AppFormatters.shortDate(_toDate.subtract(const Duration(days: 1)));
+
+    // Helper to sanitize CSV fields (handling commas and quotes)
+    String esc(dynamic val) {
+      final str = val.toString().replaceAll('"', '""');
+      if (str.contains(',') || str.contains('\n') || str.contains('"')) {
+        return '"$str"';
+      }
+      return str;
+    }
+
+    final csv = StringBuffer();
+    csv.writeln('\uFEFF${esc('LAPORAN LABA RUGI & HARGA POKOK PENJUALAN (HPP)')},,'); // UTF-8 BOM
+    csv.writeln('${esc(unitName)},,');
+    csv.writeln('${esc('Periode: $formattedFrom s.d $formattedTo')},,');
+    csv.writeln(',,');
+
+    csv.writeln('${esc('DESKRIPSI AKUN')},${esc('COA')},${esc('NOMINAL (RP)')}');
+
+    // I. Pendapatan
+    csv.writeln('${esc('I. PENDAPATAN OPERASIONAL')},,');
+    csv.writeln('${esc('Pendapatan Penjualan Sampah ke Pengepul')},4101,${esc(report.totalPendapatan)}');
+    csv.writeln('${esc('TOTAL PENDAPATAN OPERASIONAL')},,${esc(report.totalPendapatan)}');
+    csv.writeln(',,');
+
+    // II. HPP
+    csv.writeln('${esc('II. HARGA POKOK PENJUALAN (HPP) FIFO')},,');
+    csv.writeln('${esc('HPP Sampah Terjual (Pembelian dari Nasabah - FIFO)')},5101,${esc(-report.totalHpp)}');
+    csv.writeln('${esc('TOTAL HARGA POKOK PENJUALAN (HPP)')},,${esc(-report.totalHpp)}');
+    csv.writeln(',,');
+
+    // Total Laba Rugi
+    csv.writeln('${esc('LABA RUGI BERSIH TPS')},,${esc(report.labaRugiBersih)}');
+
+    AppPrintHelper.exportCsv(
+      filename: 'LabaRugi_${unitName.replaceAll(' ', '_')}_${formattedFrom}_to_$formattedTo.csv',
+      csvContent: csv.toString(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -235,6 +278,28 @@ class _HppReportScreenState extends ConsumerState<HppReportScreen> {
                 final unit = ref.read(currentUnitBisnisProvider).valueOrNull;
                 if (report != null) {
                   _printLabaRugi(report, unit);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Laporan belum dimuat sepenuhnya.')),
+                  );
+                }
+              },
+            ),
+            const SizedBox(width: 8),
+            IconButton.filledTonal(
+              icon: const Icon(Icons.table_view_rounded),
+              tooltip: 'Unduh Excel/CSV',
+              style: IconButton.styleFrom(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                backgroundColor: colorScheme.secondaryContainer,
+                foregroundColor: colorScheme.onSecondaryContainer,
+              ),
+              onPressed: () {
+                final params = HppLabaRugiParams(from: _fromDate, to: _toDate);
+                final report = ref.read(reportHppLabaRugiProvider(params)).valueOrNull;
+                final unit = ref.read(currentUnitBisnisProvider).valueOrNull;
+                if (report != null) {
+                  _exportLabaRugiCsv(report, unit);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Laporan belum dimuat sepenuhnya.')),
