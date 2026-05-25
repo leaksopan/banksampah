@@ -33,11 +33,24 @@
   <link rel="manifest" href="manifest.json">
 
   <!-- Include html2pdf.js from CDN for client-side PDF generation & downloading -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5IfS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvCpuqpQ5OPQsn3VMGrXMmAFLqmHR86COk5TGlg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 
   <script>
     function downloadPdfFromHtml(title, htmlContent) {
+      if (typeof html2pdf === 'undefined') {
+        console.warn('html2pdf is not loaded yet! Retrying in 500ms...');
+        setTimeout(function() {
+          downloadPdfFromHtml(title, htmlContent);
+        }, 500);
+        return;
+      }
       const element = document.createElement('div');
+      
+      // Position offscreen so it is invisible to the user but rendered in the DOM tree
+      element.style.position = 'absolute';
+      element.style.left = '-9999px';
+      element.style.top = '-9999px';
+      element.style.width = '790px'; // standard A4 page width reference
       
       // Inject standard printable styles so they render beautifully in html2pdf
       const style = `
@@ -119,17 +132,23 @@
       `;
       
       element.innerHTML = style + htmlContent;
+      document.body.appendChild(element); // Append to DOM so html2canvas can measure layout
       
       const opt = {
         margin:       15,
         filename:     title + '.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
       
       // Generate the PDF and automatically download it to the browser's download folder
-      html2pdf().set(opt).from(element).save();
+      html2pdf().set(opt).from(element).save().then(function() {
+        document.body.removeChild(element); // Cleanup after download completes
+      }).catch(function(error) {
+        console.error('html2pdf generation error:', error);
+        document.body.removeChild(element); // Cleanup on error
+      });
     }
   </script>
 </head>
