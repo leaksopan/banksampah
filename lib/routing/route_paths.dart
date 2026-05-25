@@ -21,6 +21,9 @@ class RoutePaths {
   static const reportKartuGudang = '/reporting/kartu-gudang';
   static const reportSaldoPegawai = '/reporting/saldo-pegawai';
   static const reportSelisihRealisasi = '/reporting/selisih-realisasi';
+  static const reportNeraca = '/reporting/neraca';
+  static const reportHppLabaRugi = '/reporting/hpp-labarugi';
+  static const reportCoaList = '/reporting/coa-list';
 
   static String approvalDetail(int userId) => '$approvalDetailBase/$userId';
   static String setoranDetail(String noBukti) {

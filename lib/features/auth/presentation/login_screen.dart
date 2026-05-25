@@ -45,7 +45,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         authScreenLaunchMode:
             kIsWeb
                 ? LaunchMode.platformDefault
-                : LaunchMode.externalApplication,
+                : LaunchMode.inAppWebView,
       );
     } on AuthException catch (error) {
       setState(() => _errorMessage = error.message);

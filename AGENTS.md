@@ -11,7 +11,7 @@ do not ever do anything flutter test jsut focus on coding unless i told you so
 
 ## 1. Konteks Proyek (TL;DR)
 
-Aplikasi **Bank Sampah Pegawai Pemerintah Daerah Kabupaten Badung**.
+Aplikasi **Bank Sampah Pegawai Pemerintah Daerah Kabupaten**.
 
 - **Client awal**: BKPSDM (Badan Kepegawaian dan Pengembangan SDM).
 - **Target user**: Staff operasional di setiap OPD (Dinas/Badan/Kantor/Kecamatan).

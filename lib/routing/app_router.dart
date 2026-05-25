@@ -21,6 +21,9 @@ import '../features/reporting/presentation/reporting_screen.dart';
 import '../features/reporting/presentation/kartu_gudang_report_screen.dart';
 import '../features/reporting/presentation/saldo_pegawai_report_screen.dart';
 import '../features/reporting/presentation/selisih_realisasi_report_screen.dart';
+import '../features/reporting/presentation/neraca_report_screen.dart';
+import '../features/reporting/presentation/hpp_report_screen.dart';
+import '../features/reporting/presentation/coa_list_screen.dart';
 import '../features/setoran/presentation/setoran_detail_screen.dart';
 import '../features/setoran/presentation/setoran_form_screen.dart';
 import '../features/setoran/presentation/setoran_list_screen.dart';
@@ -152,6 +155,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: RoutePaths.reportSelisihRealisasi,
             builder: (context, state) => const SelisihRealisasiReportScreen(),
+          ),
+          GoRoute(
+            path: RoutePaths.reportNeraca,
+            builder: (context, state) => const NeracaReportScreen(),
+          ),
+          GoRoute(
+            path: RoutePaths.reportHppLabaRugi,
+            builder: (context, state) => const HppReportScreen(),
+          ),
+          GoRoute(
+            path: RoutePaths.reportCoaList,
+            builder: (context, state) => const CoaListScreen(),
           ),
           GoRoute(
             path: '${RoutePaths.approvalDetailBase}/:userId',

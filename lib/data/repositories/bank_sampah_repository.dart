@@ -6,6 +6,10 @@ import '../models/bank_sampah_models.dart';
 
 final bankSampahRepositoryProvider = Provider<BankSampahRepository>((ref) {
   if (Uri.base.toString().contains('bypass_auth=true')) {
+    BankSampahRepository.bypassAuthActive = true;
+  }
+
+  if (BankSampahRepository.bypassAuthActive) {
     return MockBankSampahRepository();
   }
   return BankSampahRepository(ref.watch(supabaseClientProvider));
@@ -13,6 +17,8 @@ final bankSampahRepositoryProvider = Provider<BankSampahRepository>((ref) {
 
 class BankSampahRepository {
   const BankSampahRepository(this._client);
+
+  static bool bypassAuthActive = false;
 
   final SupabaseClient _client;
 
@@ -637,6 +643,41 @@ class BankSampahRepository {
     return _mapList(response, ReportSelisihRealisasi.fromJson);
   }
 
+  Future<List<COA>> listCOA() async {
+    final response = await _client.rpc('bs_list_coa');
+    return _mapList(response, COA.fromJson);
+  }
+
+  Future<List<ReportNeracaItem>> getReportNeraca({
+    required int unitBisnisId,
+    DateTime? asOfDate,
+  }) async {
+    final response = await _client.rpc(
+      'bs_report_neraca',
+      params: <String, dynamic>{
+        'p_unit_id': unitBisnisId,
+        'p_as_of_date': asOfDate?.toIso8601String(),
+      },
+    );
+    return _mapList(response, ReportNeracaItem.fromJson);
+  }
+
+  Future<ReportHppLabaRugi> getReportHppLabaRugi({
+    required int unitBisnisId,
+    DateTime? from,
+    DateTime? to,
+  }) async {
+    final response = await _client.rpc(
+      'bs_report_hpp_labarugi',
+      params: <String, dynamic>{
+        'p_unit_id': unitBisnisId,
+        'p_from': from?.toIso8601String(),
+        'p_to': to?.toIso8601String(),
+      },
+    );
+    return ReportHppLabaRugi.fromJson(_mapRpcObject(response));
+  }
+
   Future<UnitBisnis?> getUnitBisnis(int unitBisnisId) async {
     final response = await _client
         .from('mUnitBisnis')
@@ -804,6 +845,26 @@ class MockBankSampahRepository extends BankSampahRepository {
   Future<List<ReportSelisihRealisasi>> getReportSelisihRealisasi(int pegawaiId) async => const [];
 
   @override
+  Future<List<COA>> listCOA() async => const [
+    COA(coaId: '1101', coaName: 'Kas dan Bank TPS', kategoriCoa: 'AKTIVA_LANCAR', normalBalance: 'D'),
+    COA(coaId: '1103', coaName: 'Persediaan Sampah - Estimasi', kategoriCoa: 'AKTIVA_LANCAR', normalBalance: 'D'),
+    COA(coaId: '2101', coaName: 'Hutang Nasabah - Tersedia', kategoriCoa: 'KEWAJIBAN', normalBalance: 'K'),
+    COA(coaId: '2102', coaName: 'Hutang Estimasi Nasabah - Pending', kategoriCoa: 'KEWAJIBAN', normalBalance: 'K'),
+  ];
+
+  @override
+  Future<List<ReportNeracaItem>> getReportNeraca({required int unitBisnisId, DateTime? asOfDate}) async => const [
+    ReportNeracaItem(coaId: '1101', coaName: 'Kas dan Bank TPS', kategoriCoa: 'AKTIVA_LANCAR', saldo: 1500000),
+    ReportNeracaItem(coaId: '1103', coaName: 'Persediaan Sampah - Estimasi', kategoriCoa: 'AKTIVA_LANCAR', saldo: 500000),
+    ReportNeracaItem(coaId: '2101', coaName: 'Hutang Nasabah - Tersedia', kategoriCoa: 'KEWAJIBAN', saldo: 1200000),
+    ReportNeracaItem(coaId: '2102', coaName: 'Hutang Estimasi Nasabah - Pending', kategoriCoa: 'KEWAJIBAN', saldo: 800000),
+  ];
+
+  @override
+  Future<ReportHppLabaRugi> getReportHppLabaRugi({required int unitBisnisId, DateTime? from, DateTime? to}) async => const
+    ReportHppLabaRugi(totalPendapatan: 2500000, totalHpp: 2000000, totalPenyesuaianPendapatan: 500000, totalPenyesuaianBeban: 0, labaRugiBersih: 1000000);
+
+  @override
   Future<UnitBisnis?> getUnitBisnis(int unitBisnisId) async => const
     UnitBisnis(unitBisnisId: 1, unitBisnisName: 'Badan Kepegawaian dan Pengembangan SDM', kodeOpd: 'BKPSDM', tipeOpd: 'BADAN', warnaPrimary: '#2E7D32', statusAktif: true);
 
@@ -815,6 +876,16 @@ class MockBankSampahRepository extends BankSampahRepository {
   @override
   Future<Map<String, dynamic>> bulkImportPegawai({required int unitBisnisId, required List<Map<String, dynamic>> pegawaiList}) async =>
     {'ok': true, 'imported_count': pegawaiList.length};
+
+  @override
+  Future<int> countPendingUsers() async => 0;
+
+  @override
+  Future<SaldoPegawai> getSaldoPegawai(int pegawaiId) async =>
+      SaldoPegawai.empty(pegawaiId);
+
+  @override
+  Future<List<MutasiSaldo>> listMutasiPegawai(int pegawaiId, {int limit = 5}) async => const [];
 
   @override
   Future<void> logError({required String errorMessage, String? stackTrace, String? deviceInfo}) async {}

@@ -75,3 +75,49 @@ final currentPegawaiReportSelisihProvider = FutureProvider.autoDispose<List<Repo
   final repo = ref.watch(bankSampahRepositoryProvider);
   return repo.getReportSelisihRealisasi(pegawai.pegawaiId);
 });
+
+final coaListProvider = FutureProvider.autoDispose<List<COA>>((ref) async {
+  final repo = ref.watch(bankSampahRepositoryProvider);
+  return repo.listCOA();
+});
+
+final reportNeracaProvider = FutureProvider.autoDispose
+    .family<List<ReportNeracaItem>, DateTime?>((ref, asOfDate) async {
+  final repo = ref.watch(bankSampahRepositoryProvider);
+  final unitBisnis = await ref.watch(currentUnitBisnisProvider.future);
+  if (unitBisnis == null) return [];
+  return repo.getReportNeraca(unitBisnisId: unitBisnis.unitBisnisId, asOfDate: asOfDate);
+});
+
+class HppLabaRugiParams {
+  const HppLabaRugiParams({this.from, this.to});
+
+  final DateTime? from;
+  final DateTime? to;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HppLabaRugiParams &&
+          runtimeType == other.runtimeType &&
+          from == other.from &&
+          to == other.to;
+
+  @override
+  int get hashCode => from.hashCode ^ to.hashCode;
+}
+
+final reportHppLabaRugiProvider = FutureProvider.autoDispose
+    .family<ReportHppLabaRugi, HppLabaRugiParams>((ref, params) async {
+  final repo = ref.watch(bankSampahRepositoryProvider);
+  final unitBisnis = await ref.watch(currentUnitBisnisProvider.future);
+  if (unitBisnis == null) {
+    throw Exception('OPD / Unit Bisnis tidak ditemukan');
+  }
+  return repo.getReportHppLabaRugi(
+    unitBisnisId: unitBisnis.unitBisnisId,
+    from: params.from,
+    to: params.to,
+  );
+});
+

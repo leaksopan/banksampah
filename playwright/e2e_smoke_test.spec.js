@@ -27,7 +27,7 @@ test.describe('Bank Sampah E2E Browser Smoke Tests', () => {
 
   test('1. Simulasi Alur Otorisasi & Login Dashboard', async ({ page }) => {
     // 1. Kunjungi landing page web bank sampah dengan double query auth bypass
-    await page.goto('http://[::1]:5050/?bypass_auth=true#/?bypass_auth=true');
+    await page.goto('http://[::1]:5050/?bypass_auth=true#/dashboard?bypass_auth=true');
     
     // Tunggu inisialisasi Flutter engine (sangat penting untuk headless browser)
     await page.waitForTimeout(10000);
@@ -35,12 +35,11 @@ test.describe('Bank Sampah E2E Browser Smoke Tests', () => {
     // Pastikan judul halaman sesuai (case-insensitive)
     await expect(page).toHaveTitle(/Bank Sampah/i);
 
-    // Aktifkan aksesibilitas jika tombol tersedia
-    const accessibilityBtn = page.locator('button[aria-label="Enable accessibility"]').or(page.locator('text=Enable accessibility'));
-    if (await accessibilityBtn.count() > 0) {
-      await accessibilityBtn.first().click();
-      await page.waitForTimeout(3000);
-    }
+    // Aktifkan aksesibilitas Flutter Web dengan menekan tombol Tab 3 kali
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.waitForTimeout(3000);
 
     // Simulasi Dashboard termuat
     await expect(page.locator('text=Bank Sampah Pemda').or(page.locator('text=Admin BKPSDM Playwright'))).toBeVisible();
@@ -50,12 +49,11 @@ test.describe('Bank Sampah E2E Browser Smoke Tests', () => {
     await page.goto('http://[::1]:5050/?bypass_auth=true#/master?bypass_auth=true');
     await page.waitForTimeout(5000);
 
-    // Aktifkan aksesibilitas jika tombol tersedia
-    const accessibilityBtn = page.locator('button[aria-label="Enable accessibility"]').or(page.locator('text=Enable accessibility'));
-    if (await accessibilityBtn.count() > 0) {
-      await accessibilityBtn.first().click();
-      await page.waitForTimeout(3000);
-    }
+    // Aktifkan aksesibilitas
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.waitForTimeout(3000);
 
     // Pastikan berada di tab Master Data
     await expect(page.locator('text=Master Data').or(page.locator('text=Pegawai'))).toBeVisible();
@@ -90,12 +88,11 @@ test.describe('Bank Sampah E2E Browser Smoke Tests', () => {
     await page.goto('http://[::1]:5050/?bypass_auth=true#/setoran?bypass_auth=true');
     await page.waitForTimeout(5000);
 
-    // Aktifkan aksesibilitas jika tombol tersedia
-    const accessibilityBtn = page.locator('button[aria-label="Enable accessibility"]').or(page.locator('text=Enable accessibility'));
-    if (await accessibilityBtn.count() > 0) {
-      await accessibilityBtn.first().click();
-      await page.waitForTimeout(3000);
-    }
+    // Aktifkan aksesibilitas
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.waitForTimeout(3000);
 
     await expect(page.locator('text=Setoran Baru').or(page.locator('text=Daftar Setoran'))).toBeVisible();
 
@@ -115,12 +112,11 @@ test.describe('Bank Sampah E2E Browser Smoke Tests', () => {
     await page.goto('http://[::1]:5050/?bypass_auth=true#/penarikan?bypass_auth=true');
     await page.waitForTimeout(5000);
 
-    // Aktifkan aksesibilitas jika tombol tersedia
-    const accessibilityBtn = page.locator('button[aria-label="Enable accessibility"]').or(page.locator('text=Enable accessibility'));
-    if (await accessibilityBtn.count() > 0) {
-      await accessibilityBtn.first().click();
-      await page.waitForTimeout(3000);
-    }
+    // Aktifkan aksesibilitas
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.waitForTimeout(3000);
 
     await expect(page.locator('text=Ajukan Penarikan').or(page.locator('text=Daftar Penarikan'))).toBeVisible();
 

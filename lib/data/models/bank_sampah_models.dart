@@ -846,3 +846,76 @@ class UnitBisnis {
     );
   }
 }
+
+class COA {
+  const COA({
+    required this.coaId,
+    required this.coaName,
+    required this.kategoriCoa,
+    required this.normalBalance,
+  });
+
+  final String coaId;
+  final String coaName;
+  final String kategoriCoa;
+  final String normalBalance;
+
+  factory COA.fromJson(Map<String, dynamic> json) {
+    return COA(
+      coaId: json['COA_ID'] as String,
+      coaName: (json['COA_Name'] as String?) ?? '',
+      kategoriCoa: (json['Kategori_COA'] as String?) ?? '',
+      normalBalance: (json['Normal_Balance'] as String?) ?? 'D',
+    );
+  }
+}
+
+class ReportNeracaItem {
+  const ReportNeracaItem({
+    required this.coaId,
+    required this.coaName,
+    required this.kategoriCoa,
+    required this.saldo,
+  });
+
+  final String coaId;
+  final String coaName;
+  final String kategoriCoa;
+  final num saldo;
+
+  factory ReportNeracaItem.fromJson(Map<String, dynamic> json) {
+    return ReportNeracaItem(
+      coaId: json['COA_ID'] as String,
+      coaName: (json['COA_Name'] as String?) ?? '',
+      kategoriCoa: (json['Kategori_COA'] as String?) ?? '',
+      saldo: (json['Saldo'] as num?) ?? 0.0,
+    );
+  }
+}
+
+class ReportHppLabaRugi {
+  const ReportHppLabaRugi({
+    required this.totalPendapatan,
+    required this.totalHpp,
+    required this.totalPenyesuaianPendapatan,
+    required this.totalPenyesuaianBeban,
+    required this.labaRugiBersih,
+  });
+
+  final num totalPendapatan;
+  final num totalHpp;
+  final num totalPenyesuaianPendapatan;
+  final num totalPenyesuaianBeban;
+  final num labaRugiBersih;
+
+  factory ReportHppLabaRugi.fromJson(Map<String, dynamic> json) {
+    return ReportHppLabaRugi(
+      totalPendapatan: (json['Total_Pendapatan'] as num?) ?? 0.0,
+      totalHpp: (json['Total_HPP'] as num?) ?? 0.0,
+      totalPenyesuaianPendapatan: (json['Total_Penyesuaian_Pendapatan'] as num?) ?? 0.0,
+      totalPenyesuaianBeban: (json['Total_Penyesuaian_Beban'] as num?) ?? 0.0,
+      labaRugiBersih: (json['Laba_Rugi_Bersih'] as num?) ?? 0.0,
+    );
+  }
+}
+

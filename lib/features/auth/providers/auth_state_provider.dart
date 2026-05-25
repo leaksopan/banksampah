@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/config/env.dart';
 import '../../../data/models/app_user.dart';
+import '../../../data/repositories/bank_sampah_repository.dart';
 
 final supabaseClientProvider = Provider<SupabaseClient>((ref) {
   return Supabase.instance.client;
@@ -18,6 +19,10 @@ final authStateChangesProvider = StreamProvider<AuthState>((ref) {
 
 final appUserProvider = FutureProvider<AppUser?>((ref) async {
   if (Uri.base.toString().contains('bypass_auth=true')) {
+    BankSampahRepository.bypassAuthActive = true;
+  }
+
+  if (BankSampahRepository.bypassAuthActive) {
     return const AppUser(
       userId: 1,
       email: 'admin.bkpsdm@badung.go.id',

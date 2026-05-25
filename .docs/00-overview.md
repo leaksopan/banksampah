@@ -46,7 +46,7 @@ Pain points:
 
 | Role | Siapa | Kepentingan |
 |---|---|---|
-| Sponsor | BKPSDM Pemkab Badung | Pilot pertama, butuh tracking jelas |
+| Sponsor | BKPSDM Pemkab  | Pilot pertama, butuh tracking jelas |
 | End User | Staff operasional OPD | Setor sampah, lihat saldo, tarik |
 | Admin Bank Sampah | PIC tiap OPD | Input data, jual ke vendor, approval tarik |
 | Super Admin | DLH/Diskominfo (future) | Konsolidasi cross-OPD |
