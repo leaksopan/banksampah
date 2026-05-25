@@ -1,11 +1,23 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+import 'dart:js' as js;
 
 void printCurrentPageImpl() {
   html.window.print();
 }
 
 void printHtmlImpl(String title, String htmlContent) {
+  try {
+    // Attempt client-side PDF download using our premium html2pdf loader overlay
+    if (js.context.hasProperty('downloadPdfFromHtml')) {
+      js.context.callMethod('downloadPdfFromHtml', [title, htmlContent]);
+      return;
+    }
+  } catch (e) {
+    // If anything fails, fall back to native print iframe
+    // ignore: avoid_print
+    print('Error using html2pdf client side, falling back to print iframe: $e');
+  }
 
   // FALLBACK: 1. Remove existing print iframe if it exists to prevent cluttering
   html.document.getElementById('app-print-iframe')?.remove();
